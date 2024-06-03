@@ -1,0 +1,60 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            Int            @default(autoincrement())
+  uuid          String         @id @default(uuid())
+  email         String         @unique
+  name          String
+  username      String         @unique
+  password      String
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  dailyPrograms DailyProgram[] @relation("UserDailyPrograms")
+}
+
+model Exercise {
+  id             Int             @default(autoincrement())
+  uuid           String          @id @default(uuid())
+  name           String
+  description    String?
+  duration       Int // Duration in minutes 
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  dailyExercises DailyExercise[] @relation("ExerciseDailyExercises")
+}
+
+model DailyProgram {
+  id             Int             @default(autoincrement())
+  uuid           String          @id @default(uuid())
+  date           DateTime
+  userUUID       String
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  user           User            @relation("UserDailyPrograms", fields: [userUUID], references: [uuid])
+  dailyExercises DailyExercise[] @relation("DailyProgramDailyExercises")
+}
+
+model DailyExercise {
+  id               Int          @default(autoincrement())
+  uuid             String       @id @default(uuid())
+  dailyProgramUUID String
+  exerciseUUID     String
+  completed        Boolean      @default(false)
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+  dailyProgram     DailyProgram @relation("DailyProgramDailyExercises", fields: [dailyProgramUUID], references: [uuid])
+  exercise         Exercise     @relation("ExerciseDailyExercises", fields: [exerciseUUID], references: [uuid])
+}
