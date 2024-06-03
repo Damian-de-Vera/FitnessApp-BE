@@ -31,6 +31,8 @@ model Exercise {
   name           String          @unique
   description    String?
   duration       Int // Duration in minutes 
+  repetitions    Int // Number of repetitions
+  series         Int // Number of series
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
   dailyExercises DailyExercise[] @relation("ExerciseDailyExercises")
