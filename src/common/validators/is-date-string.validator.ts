@@ -19,6 +19,7 @@ export class IsDateStringConstraint implements ValidatorConstraintInterface {
   }
 }
 
+//TODO: comprobar que la fecha realmente existe (no debe pasar 2030-55-41)
 export function IsDateString(validationOptions?: ValidationOptions) {
   return function (object: Object, propertyName: string) {
     registerDecorator({

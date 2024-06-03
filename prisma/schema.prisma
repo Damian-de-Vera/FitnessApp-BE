@@ -22,7 +22,7 @@ model User {
   password      String
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
-  dailyPrograms DailyProgram[] @relation("UserDailyPrograms")
+  dailyPrograms DailyProgram[]
 }
 
 model Exercise {
@@ -43,8 +43,8 @@ model DailyProgram {
   userUUID       String
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
-  user           User            @relation("UserDailyPrograms", fields: [userUUID], references: [uuid])
-  dailyExercises DailyExercise[] @relation("DailyProgramDailyExercises")
+  user           User            @relation(fields: [userUUID], references: [uuid])
+  dailyExercises DailyExercise[]
 }
 
 model DailyExercise {
@@ -55,6 +55,6 @@ model DailyExercise {
   completed        Boolean      @default(false)
   createdAt        DateTime     @default(now())
   updatedAt        DateTime     @updatedAt
-  dailyProgram     DailyProgram @relation("DailyProgramDailyExercises", fields: [dailyProgramUUID], references: [uuid])
+  dailyProgram     DailyProgram @relation(fields: [dailyProgramUUID], references: [uuid])
   exercise         Exercise     @relation("ExerciseDailyExercises", fields: [exerciseUUID], references: [uuid])
 }

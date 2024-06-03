@@ -11,21 +11,12 @@ export class DailyProgramsService {
   async create(
     createDailyProgramDto: CreateDailyProgramDto,
   ): Promise<DailyProgram> {
-    const { date, userUUID, dailyExercisesUUIDs } = createDailyProgramDto;
+    const { date, userUUID } = createDailyProgramDto;
 
-    const dailyExercises = dailyExercisesUUIDs.map((exerciseUuid) => ({
-      exercise: {
-        connect: { uuid: exerciseUuid },
-      },
-    }));
     let dailyProgram: DailyProgram =
       await this.databaseService.dailyProgram.create({
         data: {
-          uuid: userUUID,
-          date: date,
-          dailyExercises: {
-            create: dailyExercises,
-          },
+          date: new Date(date),
           user: { connect: { uuid: userUUID } },
         },
       });
@@ -35,7 +26,9 @@ export class DailyProgramsService {
 
   async findAll(): Promise<DailyProgram[]> {
     let dailyPrograms: DailyProgram[] =
-      await this.databaseService.dailyProgram.findMany();
+      await this.databaseService.dailyProgram.findMany({
+        include: { dailyExercises: true },
+      });
     return dailyPrograms;
   }
 
@@ -45,6 +38,7 @@ export class DailyProgramsService {
         where: {
           uuid: uuid,
         },
+        include: { dailyExercises: true },
       });
     return dailyProgram;
   }

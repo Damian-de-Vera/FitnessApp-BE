@@ -7,14 +7,13 @@ import {
   Param,
   Delete,
   ValidationPipe,
+  NotFoundException,
 } from '@nestjs/common';
 import { DailyProgramsService } from './daily-programs.service';
 import { CreateDailyProgramDto } from './dto/create-daily-program.dto';
 import { UpdateDailyProgramDto } from './dto/update-daily-program.dto';
-import { DailyProgram, User } from '@prisma/client';
+import { DailyProgram } from '@prisma/client';
 import { UsersService } from 'src/users/users.service';
-import { IsDateString } from 'src/common/validators/is-date-string.validator';
-import { GetDailyProgramsDto } from './dto/get-user-daily-program.dto';
 
 @Controller('daily-programs')
 export class DailyProgramsController {
@@ -25,6 +24,15 @@ export class DailyProgramsController {
 
   @Post()
   async create(@Body() createDailyProgramDto: CreateDailyProgramDto) {
+    let user = await this.userService.findOneByUUID(
+      createDailyProgramDto.userUUID,
+    );
+    if (!user) {
+      throw new NotFoundException(
+        `User with uuid ${createDailyProgramDto.userUUID} not found`,
+      );
+    }
+
     let dailyProgram: DailyProgram = await this.dailyProgramsService.create(
       createDailyProgramDto,
     );
@@ -42,18 +50,6 @@ export class DailyProgramsController {
       await this.dailyProgramsService.findOneByUUID(uuid);
 
     return dailyProgram;
-  }
-
-  @Get('user/:uuid/daily-programs/:day')
-  async findUserDailyPrograms(
-    @Param(new ValidationPipe({ transform: true })) params: GetDailyProgramsDto,
-  ) {
-    const { uuid, day } = params;
-    let user: User = await this.userService.findOneByUUID(uuid);
-    let dailyPrograms: DailyProgram[] =
-      await this.dailyProgramsService.findUsersDailyPrograms(user, day);
-
-    return dailyPrograms;
   }
 
   @Patch(':id')

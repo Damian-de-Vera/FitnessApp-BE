@@ -34,7 +34,7 @@ export class DailyExercisesController {
     }
 
     let exercise: Exercise =
-      await this.exerciseService.findOneByName(exerciseUUID);
+      await this.exerciseService.findOneByUUID(exerciseUUID);
 
     if (!exercise) {
       throw new NotFoundException('Exercise not found');

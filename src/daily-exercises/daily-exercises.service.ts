@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateDailyExerciseDto } from './dto/create-daily-exercise.dto';
 import { UpdateDailyExerciseDto } from './dto/update-daily-exercise.dto';
 import { DatabaseService } from 'src/database/database.service';
-import { DailyExercise } from '@prisma/client';
+import { DailyExercise, DailyProgram } from '@prisma/client';
 
 @Injectable()
 export class DailyExercisesService {
@@ -19,6 +19,11 @@ export class DailyExercisesService {
           exerciseUUID: exerciseUUID,
         },
       });
+
+    await this.databaseService.dailyProgram.update({
+      where: { uuid: dailyProgramUUID },
+      data: { dailyExercises: { connect: { uuid: dailyExercise.uuid } } },
+    });
     return dailyExercise;
   }
 

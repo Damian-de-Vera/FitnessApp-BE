@@ -22,6 +22,7 @@ export class UsersService {
       where: {
         email: email,
       },
+      include: { dailyPrograms: true },
     });
     return user;
   }
