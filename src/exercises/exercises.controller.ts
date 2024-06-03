@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  BadRequestException,
 } from '@nestjs/common';
 import { ExercisesService } from './exercises.service';
 import { CreateExerciseDto } from './dto/create-exercise.dto';
@@ -18,6 +19,14 @@ export class ExercisesController {
 
   @Post()
   async create(@Body() createExerciseDto: CreateExerciseDto) {
+    let exerciseAlreadyExists = await this.exercisesService.findOneByName(
+      createExerciseDto.name,
+    );
+    if (exerciseAlreadyExists) {
+      throw new BadRequestException(
+        `Exercise ${createExerciseDto.name} already exists`,
+      );
+    }
     let exercise: Exercise =
       await this.exercisesService.create(createExerciseDto);
     return exercise;
@@ -40,6 +49,12 @@ export class ExercisesController {
     @Param('uuid') uuid: string,
     @Body() updateExerciseDto: UpdateExerciseDto,
   ) {
+    let exercise: Exercise = await this.exercisesService.findOneByUUID(uuid);
+    if (!exercise) {
+      throw new BadRequestException(
+        `Exercise with uuid: ${uuid} does not exist`,
+      );
+    }
     let exerciseUpdated = await this.exercisesService.update(
       uuid,
       updateExerciseDto,

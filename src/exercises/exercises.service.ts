@@ -30,6 +30,14 @@ export class ExercisesService {
     return exercise;
   }
 
+  async findOneByUUID(uuid: string): Promise<Exercise> {
+    let exercise: Exercise = await this.databaseService.exercise.findFirst({
+      where: {
+        uuid: uuid,
+      },
+    });
+    return exercise;
+  }
   async update(
     uuid: string,
     updateExerciseDto: UpdateExerciseDto,
